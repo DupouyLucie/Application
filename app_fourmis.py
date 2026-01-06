@@ -24,12 +24,15 @@ def main_2(page: ft.Page) :
     nodes=[]
 
     def generer_nodes():
+        nonlocal nodes
+        nodes=[]
         n=int(nodes_field.value)
         for _ in range(n):
             x=random.uniform(50,550)
             y=random.uniform(50,450)
             nodes.append([x,y])
-        print(nodes)
+        distance=calculer_distances()
+        print(distance[0][1])
         dessiner_graph()
 
 
@@ -41,11 +44,25 @@ def main_2(page: ft.Page) :
             shapes.append(rond)
         graph_container.content=ft.Stack(controls=shapes, width=600, height=500)
         page.update()
+    
+    def calculer_distances():
+        n=len(nodes)
+        distance=[[0 for i in range(n)] for j in range(n)]
+        for i in range(n):
+            for j in range(n):
+                if i!=j:
+                    x1,y1=nodes[i]
+                    x2,y2=nodes[j]
+                    d=math.sqrt((x2-x1)**2+(y2-y1)**2)
+                    distance[i][j]=d
+        return distance
+
+
     button=ft.Button("Generer le Gaphe", on_click=lambda e: generer_nodes())
     page.add(ft.Column([title,ft.Row([nodes_field,Nb_fourmis,Nb_iterations]), button, sep,texte,graph_container]))
 
 
-    
+
 
 
 ft.run(main_2)
