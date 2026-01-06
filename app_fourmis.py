@@ -1,6 +1,9 @@
 import flet as ft
 import random
 import math 
+import time
+import threading
+from ant_colony import AntColony
 
 def main(page: ft.Page) :
     page.title= "Visualisation de l'Algorithme"
@@ -23,8 +26,28 @@ def main_2(page: ft.Page) :
     sep=ft.Divider()
     nodes=[]
 
+    #ajout partie 6
+    distances = []
+    pheromones = []
+    best_bath = []
+    iteration = 0
+    running = False
+    stop_event = threading.Event()
+    best_field = ft.TextField(label="Meilleures fourmis", value="3", width=150)
+    decay_field = ft.TextField(label="Décay", value="0.95", width=150)
+    alpha_field = ft.TextField(label="Alpha", value="1", width=150)
+    beta_field = ft.TextField(label="Beta", value="2", width=150)
+    iteration_text = ft.Text("Itération: 0", size=16)
+    pheromone_text = ft.Text("Phéromones moyennes: ", size=14)
+    path_text = ft.Text("Meilleur chemin: ", size=14)
+
+
+
+
+
+
     def generer_nodes():
-        nonlocal nodes
+        nonlocal nodes , distances, pheromones
         nodes=[]
         n=int(nodes_field.value)
         for _ in range(n):
@@ -61,7 +84,13 @@ def main_2(page: ft.Page) :
     button=ft.Button("Generer le Gaphe", on_click=lambda e: generer_nodes())
     page.add(ft.Column([title,ft.Row([nodes_field,Nb_fourmis,Nb_iterations]), button, sep,texte,graph_container]))
 
-
+def main_3():
+    distances = []
+    pheromones = []
+    best_bath = []
+    iteration = 0
+    running = False
+    stop_event = threading.Event()
 
 
 
