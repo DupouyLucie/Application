@@ -31,6 +31,8 @@ class AntColony:
         # Variables pour stocker le meilleur chemin et la meilleure distance
         self.meilleur_chemin = None
         self.meilleure_distance = float('inf')
+        
+        self.it=0
 
     def run(self, callback_maj, evenement_arret):
         """
@@ -49,7 +51,19 @@ class AntColony:
         -------
         None
         """
-        pass
+        self.it+=1
+        list=self.generer_tous_chemins()
+        tri=sorted(list, key=lambda x:x[1])
+        chem,dist=tri[0]
+        if dist<self.meilleure_distance:
+            self.meilleure_distance=dist
+            self.meilleur_chemin=chem
+        self.deposer_pheromones(list)
+        self.evaporer_pheromones()
+        callback_maj(self.it,self.meilleur_chemin,self.pheromones)
+
+
+
     
     def calculer_distance_chemin(self, chemin):
         """
@@ -159,14 +173,17 @@ class AntColony:
         -------
         None
         """
-        meilleurs=sorted(tous_chemins, key=1)
+        meilleurs=sorted(tous_chemins, key=lambda x:x[1])
         meilleurs=meilleurs[:self.n_meilleurs]
         for chem,dist in meilleurs:
             for i in range(len(chem)-1):
                 self.pheromones[chem[i]][chem[i+1]]+=1/dist
 
     def evaporer_pheromones(self):
-        self.pheromones*=self.decay
+        n=len(self.pheromones)
+        for i in range(n):
+            for j in range(n):
+                self.pheromones[i][j]*=self.decay
 
 
 if __name__ == "__main__":
