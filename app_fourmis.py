@@ -19,11 +19,17 @@ def main_2(page: ft.Page) :
     page.padding=20
     title=ft.Text("Paramètres de l'algorithme", size=24, weight="bold")
     nodes_field=ft.TextField(label="Nombre de noeuds", value="20", width=150)
-    Nb_fourmis=ft.TextField(label="Nombre de fourmis", value="15", width=150)
-    Nb_iterations=ft.TextField(label="Nombre d'itérations", value="100", width=150)
+    ants_field=ft.TextField(label="Nombre de fourmis", value="15", width=150)
+    iterations_field=ft.TextField(label="Nombre d'itérations", value="100", width=150)
     graph_container=ft.Container(width=600, height=500, bgcolor="lightblue", border=ft.border.all(2, "blue"))
     texte=ft.Text("Prêt à démarrer", size=16, color="green")
+
+    button=ft.Button("Generer le Gaphe", on_click=lambda e: generer_nodes())
+    start_btn=ft.Button("Démarrer", on_click=start_algorithm)
+    stop_btn=ft.Button("Démarrer", on_click=stop_algorithm)
+
     sep=ft.Divider()
+
     nodes=[]
     status_text = ft.Text("Prêt", size=16, color="green")
     
@@ -32,7 +38,7 @@ def main_2(page: ft.Page) :
     #ajout partie 6 étape 2
     distances = []
     pheromones = []
-    best_bath = []
+    best_path = []
     iteration = 0
     running = False
     stop_event = threading.Event()
@@ -101,7 +107,8 @@ def main_2(page: ft.Page) :
         angle = math.atan2(dy, dx)
         return ft.Container(width=length, height=thickness, bgcolor=color, left=x1, top=y1 - thickness / 2,
         rotate=ft.Rotate( angle=angle, alignment=ft.alignment.Alignment(-1, 0)))
-    
+    #étape 7
+    """ affiche les noeuds du graphe, les arrêtes pondérées, le meilleur chemin courant """
     def draw_graph(): 
         """ Dessine le graphe des villes avec : 
         - les arêtes pondérées par les phéromones
@@ -172,6 +179,12 @@ def main_2(page: ft.Page) :
                     alignment=ft.alignment.Alignment(0, 0)
                 )
         )
+         # Mise à jour du conteneur graphique
+        graph_container.content = ft.Stack(controls=shapes, width=600, height=500)
+        page.update()
+            
+    # étape 8
+    """met à jour l'itération courant, affiche le meilleur chemin, met à jour le visuel et les stat"""
     def update_callback(iter_num, current_best_path, current_pheromones):
         """
         Callback appelé par l’algorithme à chaque itération
@@ -204,15 +217,89 @@ def main_2(page: ft.Page) :
 
         # Lancement asynchrone pour ne pas bloquer l’UI
         page.run_task(update_ui)
+
+    # étape 9 
+    """ coder les boutons de l'application :
+    start
     
-    # Mise à jour du conteneur graphique
-    graph_container.content = ft.Stack(controls=shapes, width=600, height=500)
-    page.update()
+    """
+
+
+    def start_algorithm(e):
+        nonlocal running
+        if running:
+            return None
+        running = True
+        stop_event.clear()
+        start_btn.disabled = True
+        stop_btn.disabled = False
+        status_text.value = "En cours d'exécution..."
+        status_text.color = "orange"
+        page.update()
+        def run_ants():
+            try:
+                colony = AntColony(
+                    distances,
+                    int(ants_field.value),
+                    int(best_field.value),
+                    int(iterations_field.value),
+                    float(decay_field.value),
+                    float(alpha_field.value),
+                    float(beta_field.value),
+                )
+            except ValueError:
+                colony = AntColony(distances, 15, 3, 100, 0.95, 1, 2)
+            colony.run(update_callback, stop_event)
+            async def finalize():
+                nonlocal running
+                running = False
+                start_btn.disabled = False
+                stop_btn.disabled = True
+                status_text.value = "Terminé"
+                status_text.color = "green"
+                page.update()
+            page.run_task(finalize)
+        threading.Thread(target=run_ants, daemon=True).start()
+    
+
+    # étape 10
+    """ arrete l'algorithme
+        rénitialise le graphe et l'interface
+        relance une nouvelle simulation"""
+
+    def stop_algorithm(e):
+        nonlocal running
+        stop_event.set()
+        start_btn.disabled = False
+        stop_btn.disabled = True
+        status_text.value = "Arrêté"
+        status_text.color = "red"
+        page.update()
+
+
+    def restart_graph(e):
+        nonlocal iteration, best_path, running
+        running = False
+        stop_event.set()
+        iteration = 0
+        best_path = []
+        iteration_text.value = "Itération: 0"
+        path_text.value = "Meilleur chemin: "
+        pheromone_text.value = "Phéromones moyennes: "
+        status_text.value = "Prêt"
+        status_text.color = "green"
+        start_btn.disabled = False
+        stop_btn.disabled = True
+        generer_nodes()
 
 
 
-    button=ft.Button("Generer le Gaphe", on_click=lambda e: generer_nodes())
-    page.add(ft.Column([title,ft.Row([nodes_field,Nb_fourmis,Nb_iterations]), button, sep,texte,graph_container]))
+
+
+
+
+    
+    page.add(ft.Column([title,ft.Row([nodes_field, ants_field, iterations_field]), ft.Row( [ button, start_btn,stop_btn]), sep,texte,graph_container]))
 
 
 
