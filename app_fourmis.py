@@ -71,9 +71,8 @@ def main_2(page: ft.Page) :
             y=random.uniform(50,450)
             nodes.append([x,y])
 
-        distance=calculer_distances()
+        distances=calculer_distances()
         pheromones=[[1.0 for _ in range(len(nodes))] for _ in range(len(nodes))]
-
         dessiner_graph()
 
 
