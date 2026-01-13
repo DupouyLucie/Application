@@ -42,8 +42,6 @@ def main_2(page: ft.Page) :
     iteration = 0
     running = False
     stop_event = threading.Event()
-    #
-
     best_field = ft.TextField(label="Meilleures fourmis", value="3", width=150)
     decay_field = ft.TextField(label="Décay", value="0.95", width=150)
     alpha_field = ft.TextField(label="Alpha", value="1", width=150)

@@ -34,6 +34,33 @@ class AntColony:
         self.meilleure_distance = float('inf')
         
         self.it=0
+    def executer_iteration(self):
+        """
+        Exécute une itération complète de l'algorithme.
+        
+        Retourne :
+        - Un tuple (meilleur_chemin, meilleure_distance) pour cette itération
+        """
+        
+        list=self.generer_tous_chemins()
+        tri=sorted(list, key=lambda x:x[1])
+        chem,dist=tri[0]
+        if dist<self.meilleure_distance:
+            self.meilleure_distance=dist
+            self.meilleur_chemin=chem
+        self.deposer_pheromones(list)
+        self.evaporer_pheromones()
+        meilleur_chemin_iteration=chem,dist
+
+        
+        return meilleur_chemin_iteration
+    
+
+
+
+
+
+
 
     def run(self, callback_maj, evenement_arret):
         """
@@ -52,17 +79,20 @@ class AntColony:
         -------
         None
         """
-        self.it+=1
-        list=self.generer_tous_chemins()
-        tri=sorted(list, key=lambda x:x[1])
-        chem,dist=tri[0]
-        if dist<self.meilleure_distance:
-            self.meilleure_distance=dist
-            self.meilleur_chemin=chem
-        self.deposer_pheromones(list)
-        self.evaporer_pheromones()
-        callback_maj(self.it,self.meilleur_chemin,self.pheromones)
-
+        for iteration in range(self.n_iterations):
+            # Vérifier si l'arrêt a été demandé
+            if evenement_arret.is_set():
+                break
+            
+            # Exécuter une itération
+            chemin_courant, distance_courante = self.executer_iteration()
+            
+            # Appeler le callback de mise à jour
+            callback_maj(iteration, chemin_courant, self.pheromones)
+            
+            # Petite pause pour permettre la mise à jour de l'interface
+            time.sleep(0.1)
+    
 
 
     
