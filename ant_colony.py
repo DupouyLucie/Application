@@ -95,16 +95,16 @@ class AntColony:
         """
         tous_chemin=[]
         for i in range(self.n_fourmis):
-            n=len(distances)
-            nb_villes=len(distances)
+            n=len(self.distances)
+            nb_villes=len(self.distances)
             num_ville_dep=random.randint(0,n-1)
             chemin=[num_ville_dep]
-            while len(chemin)!=nb_villes:
+            while len(chemin)!=nb_villes: 
                 proba=self.calculer_probabilites_mouvement(chemin)
                 ville_suivante=self.choisir_ville_suivante(proba)
                 chemin.append(ville_suivante)
             dist_tot=self.calculer_distance_chemin(chemin)
-            tous_chemin.append([[chemin,dist_tot]])
+            tous_chemin.append([chemin,dist_tot])
         return tous_chemin
 
     
@@ -129,7 +129,7 @@ class AntColony:
         proba=[]
         for l in range(len(self.distances)):
             if l not in chemin:
-                p=(self.pheromones[chemin[-1]][l]**self.alpha)*(1/self.distance[chemin[-1]][l])**self.beta
+                p=(self.pheromones[chemin[-1]][l]**self.alpha)*(1/self.distances[chemin[-1]][l])**self.beta
                 proba.append(p)
             else:
                 proba.append(0)
@@ -153,13 +153,11 @@ class AntColony:
         int
             L'indice de la ville choisie comme prochaine ville.
         """
-        ville=0
-        proba=float('inf')
-        for i in range(len(probabilites)):
-            if probabilites[i]<proba:
-                proba=probabilites[i]
-                ville=i
-        return ville
+
+        list=[i for i in range(len(probabilites))]
+        ville_suivante=random.choices(list,probabilites)[0]
+        return ville_suivante
+
 
     def deposer_pheromones(self, tous_chemins):
         """
@@ -184,7 +182,7 @@ class AntColony:
         n=len(self.pheromones)
         for i in range(n):
             for j in range(n):
-                self.pheromones[i][j]*=self.decay
+                self.pheromones[i][j]*=self.decroissance
 
 
 if __name__ == "__main__":
@@ -194,8 +192,11 @@ if __name__ == "__main__":
         [15, 7, 0, 8],
         [6, 3, 12, 0]
     ]
+    
+
+
     # Créer une instance de la colonie de fourmis
-    colonie_fourmis = AntColony(distances, n_fourmis=3, n_meilleurs=5, n_iterations=100, decroissance=0.95, alpha=1, beta=2)
+    colonie_fourmis = AntColony(distances=distances, n_fourmis=3, n_meilleurs=5, n_iterations=100, decroissance=0.95, alpha=1, beta=2)
     
     def callback_maj(iteration, meilleur_chemin, pheromones):
         """

@@ -25,8 +25,8 @@ def main_2(page: ft.Page) :
     texte=ft.Text("Prêt à démarrer", size=16, color="green")
 
     button=ft.Button("Generer le Gaphe", on_click=lambda e: generer_nodes())
-    start_btn=ft.Button("Démarrer", on_click=start_algorithm)
-    stop_btn=ft.Button("Démarrer", on_click=stop_algorithm)
+    start_btn=ft.Button("Démarrer", on_click=lambda e: start_algorithm(e))
+    stop_btn=ft.Button("Arreter", on_click=lambda e: stop_algorithm(e))
 
     sep=ft.Divider()
 
