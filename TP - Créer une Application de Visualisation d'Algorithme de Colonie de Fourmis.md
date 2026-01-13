@@ -1057,6 +1057,7 @@ beta_field = ft.TextField(label="Beta", value="2", width=150)
 ```
 ### Étape 4 — Textes d’information
 
+
 Afficher en temps réel :
 
 - l’itération actuelle
